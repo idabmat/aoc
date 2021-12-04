@@ -1,5 +1,6 @@
-defmodule Chapter1 do
-  def exec(input_path) do
+defmodule Day1.Silver do
+  @spec execute(String.t()) :: integer()
+  def execute(input_path) do
     depths =
       input_path
       |> File.read!()

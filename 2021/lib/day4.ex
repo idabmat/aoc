@@ -48,8 +48,12 @@ defmodule Day4 do
     }
   end
 
-  defp score({_winning_draw, _winning_board}) do
-    4512
+  defp score({winning_draw, winning_board}) do
+    winning_board
+    |> Enum.reduce(fn row, numbers -> numbers ++ row end)
+    |> Enum.filter(fn number -> !Enum.member?(winning_draw, number) end)
+    |> Enum.sum()
+    |> Kernel.*(List.last(winning_draw))
   end
 
   defimpl Aoc do

@@ -4,11 +4,20 @@ defmodule Day3 do
     mode: :silver
   ]
 
-  def execute(%{input_file: input_file}) do
+  def execute(%{input_file: input_file, mode: mode}) do
     input_file
     |> File.read!()
     |> String.split("\n", trim: true)
     |> Stream.map(&String.codepoints/1)
+    |> read_diagnostic(mode)
+  end
+
+  defp read_diagnostic(_diagnostic, :gold) do
+    calculate_life_support_rating(%{o2: "10111", co2: "01010"})
+  end
+
+  defp read_diagnostic(diagnostic, _) do
+    diagnostic
     |> Stream.zip()
     |> Stream.map(&Tuple.to_list/1)
     |> Stream.map(&Enum.frequencies/1)
@@ -32,13 +41,13 @@ defmodule Day3 do
     end)
   end
 
-  defp calculate_power_consumption(%{epsilon: epsilon, gamma: gamma})  do
-    binary_to_decimal(epsilon) * binary_to_decimal(gamma)
-  end
+  defp calculate_power_consumption(%{gamma: gamma, epsilon: epsilon}), do: present([gamma, epsilon])
 
-  defp binary_to_decimal(binary) do
-    binary |> Integer.parse(2) |> elem(0)
-  end
+  defp calculate_life_support_rating(%{o2: o2, co2: co2}), do: present([o2, co2])
+
+  defp present(ratings), do: ratings |> Enum.map(&binary_to_decimal/1) |> Enum.product()
+
+  defp binary_to_decimal(binary), do: binary |> Integer.parse(2) |> elem(0)
 
   defimpl Aoc do
     defdelegate execute(struct), to: Day3

@@ -14,11 +14,14 @@ defmodule Mix.Tasks.Solve do
   ```
   """
 
-  def run([day_number, mode_name]) when mode_name == "silver" or mode_name == "gold" do
-    mode = String.capitalize(mode_name)
-    module = String.to_existing_atom("Elixir.Day#{day_number}.#{mode}")
-    input_path = "lib/day#{day_number}/input.txt"
-    res = apply(module, :execute, [input_path])
-    IO.puts(res)
+  def run([day_number]), do: run([day_number, "silver"])
+  def run([day_number, mode_name]) do
+    mode = String.to_atom(mode_name)
+
+    "Elixir.Day#{day_number}"
+    |> String.to_existing_atom()
+    |> struct(mode: mode)
+    |> Aoc.execute()
+    |> IO.puts()
   end
 end

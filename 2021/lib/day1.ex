@@ -1,19 +1,29 @@
-defmodule Day1.Gold do
-  def execute(input_path) do
-    input_path
+defmodule Day1 do
+  defstruct [
+    mode: :silver,
+    input_file: "lib/day1/input.txt"
+  ]
+
+  def execute(%{input_file: input_file, mode: mode}) do
+    input_file
     |> File.read!()
     |> String.split()
     |> Enum.map(&String.to_integer/1)
-    |> replicate(3)
-    |> Enum.reduce(fn data, sum ->
-      Enum.zip_with(data, sum, &(&1 + &2))
-    end)
+    |> sample(3, mode)
     |> count()
   end
 
-  defp replicate(list, 1) do
-    [list]
+  defp sample(data, count, :gold) do
+    data
+    |> replicate(count)
+    |> Enum.reduce(fn data, sum ->
+      Enum.zip_with(data, sum, &(&1 + &2))
+    end)
   end
+
+  defp sample(data, _count, _mode), do: data
+
+  defp replicate(list, 1), do: [list]
 
   defp replicate([_head | tail] = list, size) do
     [list | replicate(tail, size - 1)]
@@ -28,5 +38,9 @@ defmodule Day1.Gold do
         {counter, measure}
     end)
     counter
+  end
+
+  defimpl Aoc do
+    defdelegate execute(struct), to: Day1
   end
 end

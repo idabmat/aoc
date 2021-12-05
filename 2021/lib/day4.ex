@@ -4,6 +4,18 @@ defmodule Day4 do
     mode: :silver
   ]
 
+  defmodule Board do
+    defstruct [
+      draw: [],
+      rows: [],
+      columns: []
+    ]
+
+    def won?(%Board{rows: rows, columns: columns, draw: draw}) do
+      rows ++ columns |> Enum.any?(fn row -> Enum.all?(row, fn number -> Enum.member?(draw, number) end) end)
+    end
+  end
+
   def execute(%{input_file: input_file}) do
     [raw_draw | raw_boards] =
       input_file
@@ -13,47 +25,39 @@ defmodule Day4 do
     boards =
       raw_boards
       |> Enum.chunk_every(5)
-      |> Enum.map(&parse_board/1)
+      |> Enum.map(&build_board/1)
 
     draw =
       raw_draw
       |> String.split(",", trim: true)
-      |> Enum.map(&String.to_integer/1)
 
     pick_winner(draw, boards)
     |> score
   end
 
-  defp parse_board(raw_board) do
-    raw_board
-    |> Enum.map(&parse_row/1)
+  defp build_board(raw_board) do
+    rows = raw_board |> Enum.map(&String.split(&1, " ", trim: true))
+    columns = rows |> Enum.zip() |> Enum.map(&Tuple.to_list/1)
+
+    %Board{rows: rows, columns: columns}
   end
 
-  defp parse_row(raw_row) do
-    raw_row
-    |> String.split(" ", trim: true)
-    |> Enum.map(&String.to_integer/1)
+  defp pick_winner([], [winning_board]),  do: winning_board
+  defp pick_winner([current_draw | remaining_draw], boards) do
+    updated_boards = Enum.map(boards, fn board -> %Board{board | draw: board.draw ++ [current_draw]} end)
+    case Enum.find(updated_boards, fn board -> Board.won?(board) end) do
+      nil -> pick_winner(remaining_draw, updated_boards)
+      winning_board -> pick_winner([], [winning_board])
+    end
   end
 
-  defp pick_winner(_draw, _boards) do
-    {
-      [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24],
-      [
-        [14, 21, 17, 24, 4],
-        [10, 16, 15, 9, 19],
-        [18, 8, 23, 26, 20],
-        [22, 11, 13, 6, 5],
-        [2, 0, 12, 3, 7]
-      ]
-    }
-  end
-
-  defp score({winning_draw, winning_board}) do
-    winning_board
+  defp score(%Board{draw: draw, rows: rows}) do
+    rows
     |> Enum.reduce(fn row, numbers -> numbers ++ row end)
-    |> Enum.filter(fn number -> !Enum.member?(winning_draw, number) end)
+    |> Enum.filter(fn number -> !Enum.member?(draw, number) end)
+    |> Enum.map(&String.to_integer/1)
     |> Enum.sum()
-    |> Kernel.*(List.last(winning_draw))
+    |> Kernel.*(draw |> List.last() |> String.to_integer())
   end
 
   defimpl Aoc do

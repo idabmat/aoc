@@ -4,7 +4,7 @@ defmodule Day3 do
     mode: :silver
   ]
 
-  def execute(%{input_file: input_file, mode: mode}) do
+  def solve(%{input_file: input_file, mode: mode}) do
     input_file
     |> File.read!()
     |> String.split("\n", trim: true)
@@ -77,6 +77,6 @@ defmodule Day3 do
   defp binary_to_decimal(binary), do: binary |> Integer.parse(2) |> elem(0)
 
   defimpl Aoc do
-    defdelegate execute(struct), to: Day3
+    defdelegate solve(day), to: Day3
   end
 end

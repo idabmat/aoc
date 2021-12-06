@@ -21,7 +21,7 @@ defmodule Mix.Tasks.Solve do
     "Elixir.Day#{day_number}"
     |> String.to_existing_atom()
     |> struct(mode: mode)
-    |> Aoc.execute()
+    |> Aoc.solve()
     |> IO.puts()
   end
 end

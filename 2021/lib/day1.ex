@@ -4,7 +4,7 @@ defmodule Day1 do
     input_file: "lib/day1/input.txt"
   ]
 
-  def execute(%{input_file: input_file, mode: mode}) do
+  def solve(%{input_file: input_file, mode: mode}) do
     input_file
     |> File.read!()
     |> String.split()
@@ -41,6 +41,6 @@ defmodule Day1 do
   end
 
   defimpl Aoc do
-    defdelegate execute(struct), to: Day1
+    defdelegate solve(day), to: Day1
   end
 end

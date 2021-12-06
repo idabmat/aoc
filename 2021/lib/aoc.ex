@@ -1,3 +1,3 @@
 defprotocol Aoc do
-  def execute(struct)
+  def solve(day)
 end

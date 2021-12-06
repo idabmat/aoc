@@ -25,7 +25,7 @@ defmodule Day4 do
     end
   end
 
-  def execute(%{input_file: input_file, mode: mode}) do
+  def solve(%{input_file: input_file, mode: mode}) do
     [raw_draw | raw_boards] =
       input_file
       |> File.read!
@@ -73,6 +73,6 @@ defmodule Day4 do
   end
 
   defimpl Aoc do
-    defdelegate execute(struct), to: Day4
+    defdelegate solve(day), to: Day4
   end
 end

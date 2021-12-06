@@ -14,9 +14,18 @@ defmodule Day4 do
     def won?(%Board{rows: rows, columns: columns, draw: draw}) do
       rows ++ columns |> Enum.any?(fn row -> Enum.all?(row, fn number -> Enum.member?(draw, number) end) end)
     end
+
+    def score(%Board{draw: draw, rows: rows}) do
+      rows
+      |> Enum.reduce(fn row, numbers -> numbers ++ row end)
+      |> Enum.filter(fn number -> !Enum.member?(draw, number) end)
+      |> Enum.map(&String.to_integer/1)
+      |> Enum.sum()
+      |> Kernel.*(draw |> List.last() |> String.to_integer())
+    end
   end
 
-  def execute(%{input_file: input_file}) do
+  def execute(%{input_file: input_file, mode: mode}) do
     [raw_draw | raw_boards] =
       input_file
       |> File.read!
@@ -31,8 +40,10 @@ defmodule Day4 do
       raw_draw
       |> String.split(",", trim: true)
 
-    pick_winner(draw, boards)
-    |> score
+    case mode do
+      :gold -> pick_loser(draw, boards) |> Board.score()
+      _ -> pick_winner(draw, boards) |> Board.score()
+    end
   end
 
   defp build_board(raw_board) do
@@ -51,13 +62,14 @@ defmodule Day4 do
     end
   end
 
-  defp score(%Board{draw: draw, rows: rows}) do
-    rows
-    |> Enum.reduce(fn row, numbers -> numbers ++ row end)
-    |> Enum.filter(fn number -> !Enum.member?(draw, number) end)
-    |> Enum.map(&String.to_integer/1)
-    |> Enum.sum()
-    |> Kernel.*(draw |> List.last() |> String.to_integer())
+  defp pick_loser([last_draw | _], [losing_board]) do
+    %Board{losing_board | draw: losing_board.draw ++ [last_draw]}
+  end
+
+  defp pick_loser([current_draw | remaining_draw], boards) do
+    updated_boards = Enum.map(boards, fn board -> %Board{board | draw: board.draw ++ [current_draw]} end)
+    losing_boards = Enum.reject(updated_boards, fn board -> Board.won?(board) end)
+    pick_loser(remaining_draw, losing_boards)
   end
 
   defimpl Aoc do
